@@ -54,13 +54,13 @@ public class DarknessConfig implements ConfigData {
         public boolean moon_phase_is_no_influence_on_light = true;
         @TomlComment("#  Option \"refuse_loading_mod_menu\" makes you cannot play in world with mod Mod Menu.\n#  Allowed value: true/false\n#  Default value: true\n")
         public boolean refuse_loading_mod_menu = false;
-        @TomlComment("#  Option \"gamma_factor\" can control the importance of the gamma option. Its effect can refer the comments below.\n#  Allowed value: [-2^(2^10), 2^(2^10)]\n#  Default value: 0\n")
+        @TomlComment("#  Option \"gamma_factor\" can control the importance of the gamma option.\n#  Allowed value: [-2^(2^10), 2^(2^10)]\n#  Default value: 0\n")
         public double gamma_factor = 0.0;
         @TomlComment("#  Option \"is_gamma_factor_as_multiple_or_exponent\" decide how option \"gamma_factor\" work.\n#  Allowed value: \"multiple\"/\"exponent\"\n#  Default value: \"exponent\"\n")
         public String is_gamma_factor_as_multiple_or_exponent = "exponent";
-        @TomlComment("#  Option \"block_light_factor\" can control the brightness of block lights. The Lower the option \"block_light_factor\" value, the darker the block lights. Its effect can refer the comments below.\n#  Allowed value: [0, 2^(2^7)]\n#  Default value: 0.25\n")
+        @TomlComment("#  Option \"block_light_factor\" can control the brightness of block lights. The Lower the option \"block_light_factor\" value, the darker the block lights.\n#  Allowed value: [0, 2^(2^7)]\n#  Default value: 0.25\n")
         public float block_light_factor = 0.25F;
-        @TomlComment("#  Option \"sky_light_factor\" can control the brightness of block lights. The Lower the option \"sky_light_factor\" value, the darker sky lights. Its effect can refer the comments below.\n#  Allowed value: [0, 2^(2^7)]\n#  Default value: 1\n")
+        @TomlComment("#  Option \"sky_light_factor\" can control the brightness of block lights. The Lower the option \"sky_light_factor\" value, the darker sky lights.\n#  Allowed value: [0, 2^(2^7)]\n#  Default value: 1\n")
         public float sky_light_factor = 1F;
     }
 }
