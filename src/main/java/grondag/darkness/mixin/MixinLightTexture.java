@@ -20,51 +20,59 @@
 
 package grondag.darkness.mixin;
 
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import grondag.darkness.Darkness;
 import grondag.darkness.LightmapAccess;
-import grondag.darkness.mixin.accessor.AccessLightTexture;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LightTexture.class)
 public class MixinLightTexture implements LightmapAccess {
 	@Final
     @Shadow
-	private NativeImage lightPixels;
+	private TextureTarget target;
 	@Shadow
 	private float blockLightRedFlicker;
 	@Shadow
 	private boolean updateLightTexture;
 
-	@Inject(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"))
-	private void onUpload(CallbackInfo ci) {
-		if (Darkness.enabled && lightPixels != null) {
-			for (int b = 0; b < 16; b++) {
-				for (int s = 0; s < 16; s++) {
-					final int color = Darkness.darken(lightPixels.getPixelRGBA(b, s), b, s);
-					lightPixels.setPixelRGBA(b, s, color);
-				}
+	@Inject(method = "updateLightTexture", at = @At("RETURN"))
+	private void onUpdateLightTextureReturn(CallbackInfo ci) {
+		if (!Darkness.enabled) return;
+
+		// bind texture of the target
+		RenderSystem.bindTexture(target.getColorTextureId());
+
+		// Create 16×16 NativeImage and download texture data
+		NativeImage image = new NativeImage(16, 16, false);
+		image.downloadTexture(0, false);   // level=0, 不强制Alpha
+
+		// Traverse all pixels and make them darker
+		for (int b = 0; b < 16; b++) {
+			for (int s = 0; s < 16; s++) {
+				// Catch ARGB and turn to ABGR
+				int colorARGB = image.getPixel(b, s);
+				int colorABGR = ARGB.toABGR(colorARGB);
+				colorABGR = Darkness.darken(colorABGR, b, s);
+				colorARGB = ARGB.fromABGR(colorABGR);
+				image.setPixel(b, s, colorARGB);
 			}
 		}
-	}
 
-	@Redirect(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V"))
-	private void redirectUpload(DynamicTexture texture) {
-		NativeImage pixels = ((AccessLightTexture) this).getLightPixels();
-		if (pixels != null) {
-			// -1 = 0xFFFFFFFF → 不透明纯白
-			pixels.setPixelRGBA(15, 15, -1);
-		}
-		// 执行原本的 upload()
-		texture.upload();
+		// Forcefully change to pure white
+		image.setPixel(15, 15, -1);
+
+		// Update pixel after changing（level=0, x=0, y=0, blur=false）
+		image.upload(0, 0, 0, false);
+		image.close();
 	}
 
 	@Override
