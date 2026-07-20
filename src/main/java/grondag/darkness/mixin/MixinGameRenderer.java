@@ -26,6 +26,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.profiling.Profiler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGameRenderer {
 	@Final
     @Shadow
-    Minecraft minecraft;
+    private Minecraft minecraft;
 	@Final
     @Shadow
 	private LightTexture lightTexture;
@@ -47,9 +48,9 @@ public class MixinGameRenderer {
 		final LightmapAccess lightmap = (LightmapAccess) lightTexture;
 
 		if (lightmap.darkness_isDirty()) {
-			minecraft.getProfiler().push("lightTex");
+			Profiler.get().push("lightTex");
 			Darkness.updateLuminance(deltaTracker.getGameTimeDeltaTicks(), minecraft, (GameRenderer) (Object) this, lightmap.darkness_prevFlicker());
-			minecraft.getProfiler().pop();
+			Profiler.get().pop();
 		}
 	}
 }
