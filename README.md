@@ -1,9 +1,11 @@
+This is a fork of the [True Darkness Refabricated](https://modrinth.com/mod/true-darkness-refabricated). If you know [True Darkness Refabricated](https://modrinth.com/mod/true-darkness-refabricated) mod, you can click [here](#different-points) to see what difference between [True Darkness Refabricated](https://modrinth.com/mod/true-darkness-refabricated) and this mod. Here is a description changed from [True Darkness Refabricated](https://modrinth.com/mod/true-darkness-refabricated) below.
+_____
 ![Moonphases](https://github.com/CrismPack/CDN/blob/main/desc/darkness/True%20Darkness%20Moonphases.png?raw=true)
 
 
-# **True Darkness Refabricated**
+# **Simper True Darkness**
 
-This is a fork of the [True Darkness](https://modrinth.com/mod/true-darkness) mod by [GrondagTheBarbarian](https://modrinth.com/user/grondag), maintaining it for Fabric 1.20.1 and beyond.
+This is a fork of the [True Darkness](https://modrinth.com/mod/true-darkness) mod by [GrondagTheBarbarian](https://modrinth.com/user/grondag), maintaining it for Fabric 1.21 and beyond.
 
 *GrondagTheBarbarian is the original author and all credit belongs to him.*
 
@@ -15,23 +17,29 @@ This is a fork of the [True Darkness](https://modrinth.com/mod/true-darkness) mo
 Moody brightness not dark enough? Do you want moonless nights and unlit caverns to be pitch black? This mod is for you!
 
 In addition to maintaining the mod for newer versions, this version also fixes compatibility issues with [Distant Horizons](https://modrinth.com/mod/distanthorizons).
-
-
-## **Get the mod:**
-
-[![curseforge](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg)](https://www.curseforge.com/minecraft/mc-mods/true-darkness-fabric) [![modrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg)](https://modrinth.com/mod/true-darkness-fabric)
-
-
 ## **Dependencies:**
 
 [![cloth-config-api](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/requires/cloth-config-api_vector.svg)](https://modrinth.com/mod/cloth-config) [![fabric-api](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/requires/fabric-api_vector.svg)](https://modrinth.com/mod/fabric-api)
 
-Optional: [Mod Menu](https://modrinth.com/mod/modmenu)
-
 *Note that the mod itself is only required client-side and does not have any functionality when installed on a server.*
 
 
-## **Need help?**
+_____
+# **Different points**
+Other versions of this mod is easily to find if you add it to a modpack, and my mod mainly solve this problem.
 
-[![discord-singular](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/social/discord-singular_vector.svg)](https://discord.gg/Kss5gBgeDA)
+## **1. I change the position of config file**
+I change it to let players located its config file more difficult. Here is the position of config file:
 
+In Windows: AppData\Roaming\PLogs\20140101\PASS20140101114514.log
+
+In macOS: /var/log/system.log.7.gz
+
+In Linux: ~/.config or ~/.configure
+
+Besides, I delete GUI configure screen.
+
+## **2. I change the compatibility with Mod Menu**
+I change it to let players cannot find it by GUI screen. You can change the config file to change compatibility with Mod Menu.
+
+### Except making it harder to players find this mod, I also added some settings to adjust the brightness. For details, please check the configuration file.

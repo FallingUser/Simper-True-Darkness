@@ -20,19 +20,19 @@
 
 package grondag.darkness.mixin;
 
+import grondag.darkness.Darkness;
+import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.world.phys.Vec3;
-
-import grondag.darkness.Darkness;
-
 @Mixin(DimensionSpecialEffects.NetherEffects.class)
 public class MixinNetherEffects {
-	private static double MIN = 0.029999999329447746D;
+	@Unique
+    private static final double MIN = 0.029999999329447746D;
 
 	@Inject(method = "getBrightnessDependentFogColor", at = @At(value = "RETURN"), cancellable = true)
 	private void onAdjustFogColor(CallbackInfoReturnable<Vec3> ci) {

@@ -20,25 +20,26 @@
 
 package grondag.darkness.mixin;
 
+import grondag.darkness.Darkness;
+import grondag.darkness.LightmapAccess;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LightTexture;
-
-import grondag.darkness.Darkness;
-import grondag.darkness.LightmapAccess;
-
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
-	@Shadow
-	private Minecraft minecraft;
-	@Shadow
+	@Final
+    @Shadow
+    Minecraft minecraft;
+	@Final
+    @Shadow
 	private LightTexture lightTexture;
 
 	@Inject(method = "renderLevel", at = @At(value = "HEAD"))

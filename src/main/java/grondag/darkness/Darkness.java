@@ -20,16 +20,6 @@
 
 package grondag.darkness;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
-import grondag.darkness.config.DarknessConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -39,39 +29,66 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Objects;
 
 public class Darkness {
 
-	public static final String MODID = "TrueDarknessRefabricated";
-	public static Logger LOG = LogManager.getLogger("TrueDarknessRefabricated");
+	public static final String MOD_ID = "SimperTrueDarkness";
+	public static Logger LOG = LogManager.getLogger("SimperTrueDarkness");
 
+	static double darkOverworldFogEffective;
 	static double darkNetherFogEffective;
 	static double darkEndFogEffective;
 
 	static {
 		try {
-			DarknessConfig.getInstance().darkNetherFog = Mth.clamp(DarknessConfig.getInstance().darkNetherFog, 0.0, 1.0);
+			DarknessInit.Config.options.darkness_factor_of_fog_in_nether = Mth.clamp(DarknessInit.Config.options.darkness_factor_of_fog_in_nether, 0.0, 1.0);
 		} catch (final Exception e) {
-			DarknessConfig.getInstance().darkNetherFog = 0.5;
-			LOG.warn("[Darkness] Invalid configuration value for 'dark_nether_fog'. Using default value.");
+			DarknessInit.Config.options.darkness_factor_of_fog_in_nether = 0.0;
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'darkness_factor_of_fog_in_nether'. Using default value.");
 		}
 		try {
-			DarknessConfig.getInstance().darkEndFog = Mth.clamp(DarknessConfig.getInstance().darkEndFog, 0.0, 1.0);
+			DarknessInit.Config.options.darkness_factor_of_fog_in_the_end = Mth.clamp(DarknessInit.Config.options.darkness_factor_of_fog_in_the_end, 0.0, 1.0);
 		} catch (final Exception e) {
-			DarknessConfig.getInstance().darkEndFog = 0.0;
-			LOG.warn("[Darkness] Invalid configuration value for 'dark_end_fog'. Using default value.");
+			DarknessInit.Config.options.darkness_factor_of_fog_in_the_end = 0.0;
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'darkness_factor_of_fog_in_the_end'. Using default value.");
+		}
+		try {
+			DarknessInit.Config.options.darkness_factor_of_fog_in_overworld = Mth.clamp(DarknessInit.Config.options.darkness_factor_of_fog_in_overworld, 0.0, 1.0);
+		} catch (final Exception e) {
+			DarknessInit.Config.options.darkness_factor_of_fog_in_overworld = 0.0;
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'darkness_factor_of_fog_in_overworld'. Using default value.");
+		}
+		try {
+			DarknessInit.Config.options.block_light_factor = Mth.clamp(DarknessInit.Config.options.block_light_factor, 0.0f, 2^128);
+		} catch (final Exception e) {
+			DarknessInit.Config.options.darkness_factor_of_fog_in_overworld = 0.0;
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'block_light_factor'. Using default value.");
+		}
+		try {
+			DarknessInit.Config.options.sky_light_factor = Mth.clamp(DarknessInit.Config.options.sky_light_factor, 0.0f, 2^128);
+		} catch (final Exception e) {
+			DarknessInit.Config.options.darkness_factor_of_fog_in_overworld = 0.0;
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'sky_light_factor'. Using default value.");
+		}
+		if (!Objects.equals(DarknessInit.Config.options.is_gamma_factor_as_multiple_or_exponent, "multiple") && !Objects.equals(DarknessInit.Config.options.is_gamma_factor_as_multiple_or_exponent, "exponent")) {
+			DarknessInit.Config.options.is_gamma_factor_as_multiple_or_exponent = "exponent";
+			LOG.warn("[Darkness] Invalid DarknessInit.Configuration value for 'is_gamma_factor_as_multiple_or_exponent'. Using default value.");
 		}
 		computeConfigValues();
 	}
 
 	private static void computeConfigValues() {
-		darkNetherFogEffective = DarknessConfig.getInstance().darkNether ? DarknessConfig.getInstance().darkNetherFog : 1.0;
-		darkEndFogEffective = DarknessConfig.getInstance().darkEnd ? DarknessConfig.getInstance().darkEndFog : 1.0;
+		darkOverworldFogEffective = DarknessInit.Config.options.fog_in_overworld_is_dark ? DarknessInit.Config.options.darkness_factor_of_fog_in_overworld : 1.0;
+		darkNetherFogEffective = DarknessInit.Config.options.nether_is_dark ? DarknessInit.Config.options.darkness_factor_of_fog_in_nether : 1.0;
+		darkEndFogEffective = DarknessInit.Config.options.end_is_dark ? DarknessInit.Config.options.darkness_factor_of_fog_in_the_end : 1.0;
 	}
 
-
-	public static boolean blockLightOnly() {
-		return DarknessConfig.getInstance().blockLightOnly;
+	public static double darkOverworldFog() {
+		return darkOverworldFogEffective;
 	}
 
 	public static double darkNetherFog() {
@@ -87,26 +104,26 @@ public class Darkness {
 		final ResourceKey<Level> dimType = world.dimension();
 
 		if (dimType == Level.OVERWORLD) {
-			return DarknessConfig.getInstance().darkOverworld;
+			return DarknessInit.Config.options.overworld_is_dark;
 		} else if (dimType == Level.NETHER) {
-			return DarknessConfig.getInstance().darkNether;
+			return DarknessInit.Config.options.nether_is_dark;
 		} else if (dimType == Level.END) {
-			return DarknessConfig.getInstance().darkEnd;
+			return DarknessInit.Config.options.end_is_dark;
 		} else if (world.dimensionType().hasSkyLight()) {
-			return DarknessConfig.getInstance().darkDefault;
+			return DarknessInit.Config.options.dark_is_default;
 		} else {
-			return DarknessConfig.getInstance().darkSkyless;
+			return !DarknessInit.Config.options.outdoor_place_in_dimension_with_sky_is_dark;
 		}
 	}
 
 	private static float skyFactor(Level world) {
-		if (!DarknessConfig.getInstance().blockLightOnly && isDark(world)) {
+		if (!DarknessInit.Config.options.no_affecting_to_sky_light && isDark(world)) {
 			if (world.dimensionType().hasSkyLight()) {
 				final float angle = world.getTimeOfDay(0);
+				final float oldWeight = Math.max(0, (Math.abs(angle - 0.5f) - 0.2f)) * 20;
+				final float moon = DarknessInit.Config.options.moon_phase_is_no_influence_on_light ? 0 : world.getMoonBrightness();
 
 				if (angle > 0.25f && angle < 0.75f) {
-					final float oldWeight = Math.max(0, (Math.abs(angle - 0.5f) - 0.2f)) * 20;
-					final float moon = DarknessConfig.getInstance().ignoreMoonPhase ? 0 : world.getMoonBrightness();
 					return Mth.lerp(oldWeight * oldWeight * oldWeight, moon * moon, 1f);
 				} else {
 					return 1;
@@ -119,7 +136,7 @@ public class Darkness {
 		}
 	}
 
-	public static boolean enabled = false;
+	public static boolean enabled = true;
 	private static final float[][] LUMINANCE = new float[16][16];
 
 	public static int darken(int c, int blockIndex, int skyIndex) {
@@ -128,9 +145,11 @@ public class Darkness {
 		final float g = ((c >> 8) & 0xFF) / 255f;
 		final float b = ((c >> 16) & 0xFF) / 255f;
 		final float l = luminance(r, g, b);
-		final float f = l > 0 ? Math.min(1, lTarget / l) : 0;
+		float f;
+		f = l > 0 ? Math.min(1, lTarget / l) : 0;
 
-		return f == 1f ? c : 0xFF000000 | Math.round(f * r * 255) | (Math.round(f * g * 255) << 8) | (Math.round(f * b * 255) << 16);
+		final var i = 0xFF << 24 | Math.round(f * r * 255) | (Math.round(f * g * 255) << 8) | (Math.round(f * b * 255) << 16);
+		return f == 1f ? c : i;
 	}
 
 	public static float luminance(float r, float g, float b) {
@@ -140,22 +159,22 @@ public class Darkness {
 	public static void updateLuminance(float tickDelta, Minecraft client, GameRenderer worldRenderer, float prevFlicker) {
 		final ClientLevel world = client.level;
 
-		if (world != null) {
-			if (!isDark(world) || client.player.hasEffect(MobEffects.NIGHT_VISION) || (client.player.hasEffect(MobEffects.CONDUIT_POWER) && client.player.getWaterVision() > 0) || world.getSkyFlashTime() > 0) {
-				enabled = false;
-				return;
-			} else {
+		if (world != null && client.player != null) {
+            if (!isDark(world) || client.player.hasEffect(MobEffects.NIGHT_VISION) || (client.player.hasEffect(MobEffects.CONDUIT_POWER) && client.player.getWaterVision() > 0) || world.getSkyFlashTime() > 0) {
+                enabled = false;
+                return;
+            } else {
 				enabled = true;
 			}
 
-			final float dimSkyFactor = Darkness.skyFactor(world);
+            final float dimSkyFactor = Darkness.skyFactor(world);
 			final float ambient = world.getSkyDarken(1.0F);
 			final DimensionType dim = world.dimensionType();
 			final boolean blockAmbient = !Darkness.isDark(world);
 
 			for (int skyIndex = 0; skyIndex < 16; ++skyIndex) {
 				float skyFactor = 1f - skyIndex / 15f;
-				skyFactor = 1 - skyFactor * skyFactor * skyFactor * skyFactor;
+				skyFactor = DarknessInit.Config.options.sky_light_factor - skyFactor * skyFactor * skyFactor * skyFactor;
 				skyFactor *= dimSkyFactor;
 
 				float min = skyFactor * 0.05f;
@@ -165,7 +184,7 @@ public class Darkness {
 
 				min = 0.35f * skyFactor;
 				float skyRed = skyBase * (rawAmbient * (1 - min) + min);
-				float skyGreen = skyBase * (rawAmbient * (1 - min) + min);
+				float skyGreen = skyRed;
 				float skyBlue = skyBase;
 
 				if (worldRenderer.getDarkenWorldAmount(tickDelta) > 0.0F) {
@@ -180,7 +199,7 @@ public class Darkness {
 
 					if (!blockAmbient) {
 						blockFactor = 1f - blockIndex / 15f;
-						blockFactor = 1 - blockFactor * blockFactor * blockFactor * blockFactor;
+						blockFactor = DarknessInit.Config.options.block_light_factor - blockFactor * blockFactor * blockFactor * blockFactor;
 					}
 
 					final float blockBase = blockFactor * LightTexture.getBrightness(dim, blockIndex) * (prevFlicker * 0.1F + 1.5F);
@@ -216,7 +235,12 @@ public class Darkness {
 						blue = 1.0F;
 					}
 
-					final float gamma = client.options.gamma().get().floatValue() * f;
+					float gamma = 0;
+					if (Objects.equals(DarknessInit.Config.options.is_gamma_factor_as_multiple_or_exponent, "multiple")) {
+						gamma = (float) (client.options.gamma().get().floatValue() * f * DarknessInit.Config.options.gamma_factor);
+					} else if (Objects.equals(DarknessInit.Config.options.is_gamma_factor_as_multiple_or_exponent, "exponent")) {
+						gamma = (float) (Math.pow(client.options.gamma().get().floatValue(), DarknessInit.Config.options.gamma_factor) * f);
+					}
 					float invRed = 1.0F - red;
 					float invGreen = 1.0F - green;
 					float invBlue = 1.0F - blue;

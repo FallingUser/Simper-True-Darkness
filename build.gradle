@@ -1,10 +1,12 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.17-SNAPSHOT'
 	id 'maven-publish'
 }
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version + "+mc" + project.minecraft_version
+base {
+	archivesName = "[" + project.minecraft_version + "+]" + project.archives_base_name
+}
+version = project.mod_version + "-${project.supported_versions}"
 group = project.maven_group
 
 repositories {
@@ -13,8 +15,7 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven { url "https://maven.shedaniel.me/" }					//Cloth
-	maven { url "https://maven.terraformersmc.com/releases/" }	//Modmenu
+	maven { url "https://maven.shedaniel.me/" }		//Cloth
 	maven { url "https://api.modrinth.com/maven" }	//Modrinth
 }
 
@@ -34,12 +35,25 @@ dependencies {
 	//include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 
 	//Mod Menu
-	modCompileOnly modRuntimeOnly ("com.terraformersmc:modmenu:${project.mod_menu_version}"), {
+	modCompileOnly modRuntimeOnly ("maven.modrinth:modmenu:${project.mod_menu_version}"), {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 
 	//Sodium
 	modCompileOnly modRuntimeOnly ("maven.modrinth:sodium:${project.sodium_version}")
+	//You must install it, or it will made a serious render problem.
+
+	//JEI
+	//modCompileOnly modRuntimeOnly ("maven.modrinth:jei:${project.jei_version}")
+
+	//REI
+	//modCompileOnly modRuntimeOnly ("maven.modrinth:rei:${project.rei_version}")
+
+	//Architecture API
+	//modCompileOnly modRuntimeOnly ("maven.modrinth:architectury-api:${project.architectury_api_version}")
+
+	//AppleSkin
+	//modCompileOnly modRuntimeOnly ("maven.modrinth:appleskin:${project.appleskin_version}")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
@@ -67,28 +81,4 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
 }
