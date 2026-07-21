@@ -102,9 +102,6 @@ public class DarknessInit implements ModInitializer {
                 System.exit(1);
             }
         }
-        if (!FabricLoader.getInstance().isModLoaded("sodium") && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ClientLifecycleEvents.CLIENT_STARTED.register(client -> client.execute(() -> client.setScreen(new WarningScreen())));
-        }
     }
 
     @Environment(EnvType.CLIENT)
@@ -121,18 +118,13 @@ public class DarknessInit implements ModInitializer {
 
         @Override
         public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            this.renderBackground(); // 1.20.1 接受 GuiGraphics
+            this.renderBackground();
 
             Component title;
             Component sub;
 
-            if (FabricLoader.getInstance().isModLoaded("modmenu") && Config.options.refuse_loading_mod_menu) {
-                title = Component.literal("Delete Mod Menu!").withStyle(ChatFormatting.RED);
-                sub = Component.literal("This Modpack is unavailable with Mod Menu.").withStyle(ChatFormatting.RED);
-            } else {
-                title = Component.literal("Install Sodium!").withStyle(ChatFormatting.RED);
-                sub = Component.literal("This Modpack is unavailable without Sodium.").withStyle(ChatFormatting.RED);
-            }
+            title = Component.literal("Delete Mod Menu!").withStyle(ChatFormatting.RED);
+            sub = Component.literal("This Modpack is unavailable with Mod Menu.").withStyle(ChatFormatting.RED);
 
             guiGraphics.drawCenteredString(this.font, title, this.width / 2, this.height / 2 - 40, 0xFFFFFF);
             guiGraphics.drawCenteredString(this.font, sub, this.width / 2, this.height / 2 - 10, 0xFFFFFF);
