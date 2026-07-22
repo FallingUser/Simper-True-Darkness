@@ -41,7 +41,6 @@ dependencies {
 
 	//Sodium
 	modCompileOnly modRuntimeOnly ("maven.modrinth:sodium:${project.sodium_version}")
-	//You must install it, or it will made a serious render problem.
 
 	//JEI
 	//modCompileOnly modRuntimeOnly ("maven.modrinth:jei:${project.jei_version}")
