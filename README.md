@@ -21,6 +21,8 @@ In addition to maintaining the mod for newer versions, this version also fixes c
 
 [![cloth-config-api](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/requires/cloth-config-api_vector.svg)](https://modrinth.com/mod/cloth-config) [![fabric-api](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/requires/fabric-api_vector.svg)](https://modrinth.com/mod/fabric-api)
 
+### You also must install [sodium](https://modrinth.com/mod/sodium) mod in Simper True Darkness 2.0. In other versions, [sodium](https://modrinth.com/mod/sodium) mod is optional.
+
 *Note that the mod itself is only required client-side and does not have any functionality when installed on a server.*
 
 
